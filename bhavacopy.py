@@ -17,6 +17,8 @@ from datetime import datetime, timedelta
 
 from zipfile import ZipFile
 
+import redis
+
 import requests
 
 
@@ -56,10 +58,6 @@ def get_date_string():
     return valid_date.strftime('%d%m%y')
 
 
-def update_to_redis():
-    pass
-
-
 def parse_csv(date_str):
     """
     Parses csv and returns a dict consisting of rows of data
@@ -78,7 +76,12 @@ def parse_csv(date_str):
             row_data['low'] = r[6]
             row_data['close'] = r[7]
             dataset.append(row_data)
-    return {date_str: dataset}
+    return str(dataset)
+
+
+def update_to_redis(date_str, data):
+    r = redis.StrictRedis(host='localhost', port=6379, db=0)
+    r.set(date_str, data)
 
 
 def process():
@@ -92,3 +95,5 @@ def process():
     response = requests.get(url)
     z = ZipFile(io.BytesIO(response.content))
     z.extractall()
+    data = parse_csv(date_str)
+    update_to_redis(date_str, data)
