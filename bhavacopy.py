@@ -12,6 +12,7 @@ parse the csv data.
 """
 import csv
 import io
+import json
 
 from datetime import datetime, timedelta
 
@@ -78,12 +79,12 @@ def parse_csv(date_str):
             row_data['low'] = r[6]
             row_data['close'] = r[7]
             dataset.append(row_data)
-    return str(dataset)
+    return json.dumps({date_str: dataset})
 
 
 def update_to_redis(date_str, data):
     r = redis.StrictRedis(host='localhost', port=6379, db=0)
-    r.set(date_str, data)
+    r.set('bhavcopy', data)
 
 
 def process():
