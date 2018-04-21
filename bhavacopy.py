@@ -66,9 +66,11 @@ def parse_csv(date_str):
     """
     dataset = []
     with open('EQ{}.CSV'.format(date_str), 'r') as f:
-        row_data = {}
         cr = csv.reader(f)
-        for index, r in enumerate(cr, start=1):
+        for index, r in enumerate(cr):
+            if index == 0:
+                continue
+            row_data = {}
             row_data['code'] = r[0]
             row_data['name'] = r[1]
             row_data['open'] = r[4]
@@ -97,3 +99,7 @@ def process():
     z.extractall()
     data = parse_csv(date_str)
     update_to_redis(date_str, data)
+
+
+if __name__ == '__main__':
+    process()
