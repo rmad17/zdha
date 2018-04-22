@@ -33,7 +33,6 @@ class Index:
     def search_by_name(self, name='', date_str='200418'):
         context = []
         for i, ds in enumerate(self.get_redis_data(date_str)):
-            print(name, ds['name'])
             if ds['name'].strip() == name.strip():
                 if float(ds['close']) > float(ds['open']):
                     ds['fontcolor'] = "font-white bg-success"
