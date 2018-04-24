@@ -78,6 +78,7 @@ def parse_csv(date_str):
             row_data['high'] = r[5]
             row_data['low'] = r[6]
             row_data['close'] = r[7]
+            row_data['change'] = str(float(r[7]) - float(r[5]))
             dataset.append(row_data)
     return json.dumps({date_str: dataset})
 

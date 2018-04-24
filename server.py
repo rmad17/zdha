@@ -9,6 +9,10 @@ import json
 
 import os
 
+from operator import itemgetter
+
+from bhavacopy import get_date_string
+
 import cherrypy
 
 from jinja2 import Environment, FileSystemLoader
@@ -30,7 +34,7 @@ class Index:
         raw_data = json.loads(raw_data.decode('utf-8'))
         return raw_data[date_str]
 
-    def search_by_name(self, name='', date_str='200418'):
+    def search_by_name(self, name='', date_str=get_date_string()):
         context = []
         for i, ds in enumerate(self.get_redis_data(date_str)):
             if ds['name'].strip() == name.strip():
@@ -42,12 +46,17 @@ class Index:
                 break
         return context
 
-    def get_data(self, date_str='200418'):
+    def get_top_stocks(self, date_str=get_date_string()):
+        data = self.get_redis_data(date_str)
+        sorted_data = sorted(data, key=itemgetter('change'), reverse=True)
+        return sorted_data[:10]
+
+    def get_data(self, date_str=get_date_string()):
         context = []
         for i, ds in enumerate(self.get_redis_data(date_str)):
             if i > 9:
                 break
-            if float(ds['close']) > float(ds['open']):
+            if float(ds['change']) > 0:
                 ds['fontcolor'] = "font-green"
             else:
                 ds['fontcolor'] = "font-orange"
@@ -57,7 +66,7 @@ class Index:
     @cherrypy.expose()
     def index(self):
         template = env.get_template('stocks.html')
-        context = {'stocks': self.get_data()}
+        context = {'top_stocks': self.get_top_stocks()}
         return template.render(**context)
 
     @cherrypy.expose()

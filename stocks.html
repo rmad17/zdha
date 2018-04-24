@@ -36,8 +36,8 @@
         </tr>
         </thead>
         <tbody>
-        {% for stock in stocks %}
-        <tr class="{{ stock.fontcolor }}">
+        {% for stock in top_stocks %}
+        <tr class="text-success">
             <td> {{ loop.index }} </td>
             <td> {{ stock.code }} </td>
             <td> {{ stock.name }}</td>
